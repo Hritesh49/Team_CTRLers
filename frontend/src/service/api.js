@@ -10,13 +10,3 @@ export const analyzeSingleReview = async (reviewText) => {
   if (!response.ok) throw new Error('Failed to analyze review');
   return await response.json();
 };
-
-export const analyzeBatchReviews = async (reviewsArray) => {
-  const response = await fetch(`${BASE_URL}/batch-analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reviews: reviewsArray }),
-  });
-  if (!response.ok) throw new Error('Failed to analyze batch reviews');
-  return await response.json();
-};
