@@ -1,21 +1,15 @@
 from models import sentiment_model, emotion_model, absa_pipeline
-import json
-import csv
-import os
 import spacy
+from langdetect import detect
+from deep_translator import GoogleTranslator
 
-# Load spaCy model
 nlp = spacy.load("en_core_web_sm")
-
-# List of predefined aspects to check for in the review
 ASPECTS = ["delivery", "product", "price", "packaging", "support"]
 
-# Checks if an aspect is mentioned in the noun phrases of the review
 def is_aspect_mentioned(aspect, review_text):
     doc = nlp(review_text)
     return any(aspect in chunk.text.lower() for chunk in doc.noun_chunks)
 
-# Filters out aspects not mentioned in the review text
 def filter_aspects(aspect_dict, review_text):
     return {
         aspect: value
@@ -23,30 +17,37 @@ def filter_aspects(aspect_dict, review_text):
         if is_aspect_mentioned(aspect, review_text)
     }
 
-# Logs result into a local CSV file (only needed for debug or legacy logging)
-def log_analysis(review, result, filename='logs.csv'):
-    log_file = os.path.join(os.getcwd(), filename)
-    with open(log_file, mode='a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow([review, json.dumps(result)])
+def translate_if_needed(text, target_lang="en"):
+    try:
+        detected_lang = detect(text)
+        if detected_lang != target_lang:
+            translated = GoogleTranslator(source='auto', target=target_lang).translate(text)
+            return translated
+        return text
+    except Exception as e:
+        print(f"⚠️ Language detection/translation failed: {e}")
+        return text
 
-# Main function: Analyze a single review and return sentiment, emotion, and filtered aspects
 def analyze_single_review(review):
-    sentiment = sentiment_model(review)[0]  # e.g., {'label': 'POSITIVE', 'score': 0.98}
-    emotion = emotion_model(review)[0]      # e.g., {'label': 'joy', 'score': 0.85}
+    review_in_english = translate_if_needed(review)
+
+    sentiment = sentiment_model(review_in_english)[0]
+    emotion = emotion_model(review_in_english)[0]
 
     aspect_sentiments = {}
     for aspect in ASPECTS:
-        input_text = f"{review} [SEP] {aspect}"
+        input_text = f"{review_in_english} [SEP] {aspect}"
         result = absa_pipeline(input_text)[0]
         aspect_sentiments[aspect] = {
             "label": result["label"],
             "score": round(result["score"], 3)
         }
 
-    filtered_aspects = filter_aspects(aspect_sentiments, review)
+    filtered_aspects = filter_aspects(aspect_sentiments, review_in_english)
 
     result = {
+        "original_review": review,
+        "translated_review": review_in_english,
         "sentiment": {
             "label": sentiment["label"],
             "score": round(sentiment["score"], 3)
@@ -58,11 +59,4 @@ def analyze_single_review(review):
         "aspect_sentiments": filtered_aspects
     }
 
-    # Optional CSV log – not needed if you're using database logging
-    log_analysis(review, result)
-
     return result
-
-# Analyze a batch of reviews (list of strings)
-def analyze_batch_reviews(reviews):
-    return [analyze_single_review(review) for review in reviews]

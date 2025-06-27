@@ -1,7 +1,11 @@
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 
 # General sentiment analysis model
-sentiment_model = pipeline("sentiment-analysis")
+sentiment_model = pipeline(
+    "sentiment-analysis",
+    model="distilbert/distilbert-base-uncased-finetuned-sst-2-english",
+    revision="714eb0f"
+)
 
 # Emotion detection model
 emotion_model = pipeline(

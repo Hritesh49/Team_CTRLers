@@ -1,8 +1,0 @@
-review,sentiment,sentiment_score,emotion,emotion_score,hash,delivery_sentiment,delivery_score,product_sentiment,product_score,support_sentiment,support_score,timestamp
-Excellent battery life and camera.,POSITIVE,1.0,neutral,0.715,0aa0f45d6219b2923fdfb5b6c49ce1a4,,,,,,,2025-06-15T20:36:09.838020
-Too expensive and delivery was slow.,NEGATIVE,1.0,sadness,0.791,79a61e1a5ba9a0ab40dcb86b46a4a1f7,Negative,0.997,,,,,2025-06-15T20:36:09.838020
-Good product but poor customer support.,NEGATIVE,0.947,disgust,0.464,579f904168e0dbf172a91cb5dbb76ec3,,,Positive,0.997,Negative,0.994,2025-06-15T20:36:09.838020
-The product quality is awesome but delivery was late.,NEGATIVE,0.989,sadness,0.562,Negative,0.997,Positive,0.996,d4267efe362e6a363f7f55ffba5edba4,2025-06-16T00:00:30.332621
-I loved the packaging and product.,POSITIVE,1.0,joy,0.978,Positive,0.995,Positive,0.997,d1f32f71597209501d78616fe7f49ed4,2025-06-16T00:01:21.114099
-I loved the customer the support and awesome packaging.,POSITIVE,1.0,joy,0.987,Positive,0.998,Positive,0.993,ca8d336c90995a56dee8c16a990b37ac,2025-06-17T16:29:20.239918
-This is the worst product i have ever seen in my life,NEGATIVE,1.0,disgust,0.983,Negative,0.998,edf63efb95152b1c8dd880b49133ee96,2025-06-17T16:32:44.089898
