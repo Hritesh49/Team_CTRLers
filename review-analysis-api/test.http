@@ -1,0 +1,19 @@
+### Single Review Test
+POST http://127.0.0.1:5000/analyze-review
+Content-Type: application/json
+
+{
+  "review": "The product quality is awesome but delivery was late."
+}
+
+### Batch Review Test
+POST http://127.0.0.1:5000/batch-analyze
+Content-Type: application/json
+
+{
+  "reviews": [
+    "Excellent battery life and camera.",
+    "Too expensive and delivery was slow.",
+    "Good product but poor customer support."
+  ]
+}

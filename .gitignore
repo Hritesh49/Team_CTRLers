@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+venv311/
+
+# Node
+node_modules/
+dist/
+.env
+
+# Logs
+*.log
+logs.csv
