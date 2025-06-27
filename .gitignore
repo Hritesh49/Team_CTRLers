@@ -1,10 +1,11 @@
 # Python
-__pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.db
-venv311/
+backend/review-analysis-api/venv311/
+backend/review-analysis-api/__pycache__/
+
 
 # Node
 node_modules/
