@@ -3,12 +3,23 @@ import spacy
 from langdetect import detect
 from deep_translator import GoogleTranslator
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_lg")
+
 ASPECTS = ["delivery", "product", "price", "packaging", "support"]
+SIMILARITY_THRESHOLD = 0.7
 
 def is_aspect_mentioned(aspect, review_text):
-    doc = nlp(review_text)
-    return any(aspect in chunk.text.lower() for chunk in doc.noun_chunks)
+    doc = nlp(review_text.lower())
+    aspect_doc = nlp(aspect.lower())
+    for chunk in doc.noun_chunks:
+        chunk_text = chunk.text.strip()
+        if aspect in chunk_text:
+            return True
+        chunk_doc = nlp(chunk_text)
+        similarity = chunk_doc.similarity(aspect_doc)
+        if similarity >= SIMILARITY_THRESHOLD:
+            return True
+    return False
 
 def filter_aspects(aspect_dict, review_text):
     return {
@@ -30,10 +41,8 @@ def translate_if_needed(text, target_lang="en"):
 
 def analyze_single_review(review):
     review_in_english = translate_if_needed(review)
-
     sentiment = sentiment_model(review_in_english)[0]
     emotion = emotion_model(review_in_english)[0]
-
     aspect_sentiments = {}
     for aspect in ASPECTS:
         input_text = f"{review_in_english} [SEP] {aspect}"
@@ -42,9 +51,7 @@ def analyze_single_review(review):
             "label": result["label"],
             "score": round(result["score"], 3)
         }
-
     filtered_aspects = filter_aspects(aspect_sentiments, review_in_english)
-
     result = {
         "original_review": review,
         "translated_review": review_in_english,
@@ -58,5 +65,4 @@ def analyze_single_review(review):
         },
         "aspect_sentiments": filtered_aspects
     }
-
     return result

@@ -1,14 +1,23 @@
-from sqlalchemy import create_engine, Column, String, Float, DateTime, Text
+from sqlalchemy import create_engine, Column, String, Float, DateTime, Text, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from datetime import datetime, timezone
 
 Base = declarative_base()
+
+class Product(Base):
+    __tablename__ = 'products'
+    id = Column(String, primary_key=True)  # Example: "p1", "mouse001"
+    name = Column(String, nullable=False)
+    description = Column(Text)
+    price = Column(Float)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
 class ReviewLog(Base):
     __tablename__ = 'review_logs'
     review = Column(Text, primary_key=True)
     hash = Column(String, unique=True)
+    product_id = Column(String, ForeignKey('products.id'), nullable=False)
     sentiment = Column(String)
     sentiment_score = Column(Float)
     emotion = Column(String)
@@ -23,9 +32,8 @@ class ReviewLog(Base):
     packaging_score = Column(Float)
     support_sentiment = Column(String)
     support_score = Column(Float)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.now(timezone.utc))
 
-# Replace with your PostgreSQL URL if needed
 engine = create_engine("sqlite:///review_logs.db")
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)
