@@ -12,17 +12,56 @@ CORS(app, origins=["http://localhost:5173"])
 def home():
     return "Review Analysis API is running!"
 
+@app.route('/products/<product_id>', methods=['PUT'])
+def update_product(product_id):
+    data = request.get_json()
+    session = SessionLocal()
+    try:
+        product = session.query(Product).filter_by(id=product_id).first()
+        if not product:
+            return jsonify({"error": "Product not found"}), 404
+
+        product.name = data.get("name", product.name)
+        product.description = data.get("description", product.description)
+        product.price = data.get("price", product.price)
+
+        session.commit()
+        return jsonify({"message": "✅ Product updated successfully!"})
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        session.close()
+
+@app.route('/products/<product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    session = SessionLocal()
+    try:
+        product = session.query(Product).filter_by(id=product_id).first()
+        if not product:
+            return jsonify({"error": "Product not found"}), 404
+
+        session.delete(product)
+        session.commit()
+        return jsonify({"message": "🗑️ Product deleted successfully!"})
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        session.close()
+
+
 @app.route('/products', methods=['POST'])
 def add_product():
     data = request.get_json()
     session = SessionLocal()
     try:
         new_product = Product(
-            id=data["id"],
-            name=data["name"],
-            description=data.get("description", ""),
-            price=data.get("price", 0.0),
-        )
+    name=data["name"],
+    description=data.get("description", ""),
+    price=data.get("price", 0.0),
+)
+
         session.add(new_product)
         session.commit()
         return jsonify({"message": "✅ Product added successfully!"})

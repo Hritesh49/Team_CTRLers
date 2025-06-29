@@ -2,17 +2,18 @@ from sqlalchemy import create_engine, Column, String, Float, DateTime, Text, For
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timezone
+import uuid
 
 Base = declarative_base()
 
 class Product(Base):
     __tablename__ = 'products'
-    id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))  # 👈 UUID here
     name = Column(String, nullable=False)
     description = Column(Text)
     price = Column(Float)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-
+    
 class ReviewLog(Base):
     __tablename__ = 'review_logs'
     review = Column(Text, primary_key=True)
