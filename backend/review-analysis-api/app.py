@@ -86,14 +86,16 @@ def save_to_db(review, result, product_id):
         session.close()
 
 @app.route('/analyze-review', methods=['POST'])
-def analyze_review_endpoint():
+def analyze_review_and_return_new():
     data = request.get_json()
     review = data.get("review")
     product_id = data.get("product_id")
     result = analyze_single_review(review)
-    result["timestamp"] = datetime.now(timezone.utc).isoformat()
+    result["timestamp"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    result["product_id"] = product_id
     save_to_db(review, result, product_id)
-    return jsonify(result)
+    return jsonify(result), 201
+
 
 @app.route('/reviews/<product_id>', methods=['GET'])
 def get_reviews_by_product(product_id):
@@ -113,7 +115,7 @@ def get_reviews_by_product(product_id):
                     "packaging": {"label": log.packaging_sentiment, "score": log.packaging_score},
                     "support": {"label": log.support_sentiment, "score": log.support_score}
                 },
-                "timestamp": log.timestamp.isoformat() if log.timestamp else None
+                "timestamp": log.timestamp.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') if log.timestamp else None
             })
         return jsonify(result)
     except Exception as e:

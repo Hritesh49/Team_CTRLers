@@ -1,41 +1,45 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchProductReviews } from '../../service/api';
+import { getReviewsByProductId, analyzeSingleReview } from '../../service/api';
 
-export const getProductReviews = createAsyncThunk(
-  'productReviews/getProductReviews',
+export const fetchProductReviews = createAsyncThunk(
+  'productReviews/fetch',
   async (productId, { rejectWithValue }) => {
     try {
-      return await fetchProductReviews(productId);
+      return await getReviewsByProductId(productId);
     } catch (err) {
       return rejectWithValue(err.message);
     }
   }
 );
 
-const productReviewsSlice = createSlice({
+const productReviewSlice = createSlice({
   name: 'productReviews',
   initialState: {
-    loading: false,
     reviews: [],
+    loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    appendNewReview: (state, action) => {
+      state.reviews.unshift(action.payload); // Add to top
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(getProductReviews.pending, (state) => {
+      .addCase(fetchProductReviews.pending, (state) => {
         state.loading = true;
-        state.reviews = [];
         state.error = null;
       })
-      .addCase(getProductReviews.fulfilled, (state, action) => {
+      .addCase(fetchProductReviews.fulfilled, (state, action) => {
         state.loading = false;
         state.reviews = action.payload;
       })
-      .addCase(getProductReviews.rejected, (state, action) => {
+      .addCase(fetchProductReviews.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export default productReviewsSlice.reducer;
+export const { appendNewReview } = productReviewSlice.actions;
+export default productReviewSlice.reducer;

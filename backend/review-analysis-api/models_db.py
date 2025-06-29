@@ -7,11 +7,11 @@ Base = declarative_base()
 
 class Product(Base):
     __tablename__ = 'products'
-    id = Column(String, primary_key=True)  # Example: "p1", "mouse001"
+    id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(Text)
     price = Column(Float)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 class ReviewLog(Base):
     __tablename__ = 'review_logs'
@@ -32,8 +32,9 @@ class ReviewLog(Base):
     packaging_score = Column(Float)
     support_sentiment = Column(String)
     support_score = Column(Float)
-    timestamp = Column(DateTime, default=datetime.now(timezone.utc))
+    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # ✅ UTC
 
+# DB Setup
 engine = create_engine("sqlite:///review_logs.db")
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)

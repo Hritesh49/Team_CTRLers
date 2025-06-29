@@ -1,18 +1,18 @@
-import { Routes, Route, Link } from "react-router-dom";
-import Products from "./pages/Products";
-import ProductReviewList from "./pages/ProductReviewList";
+// src/App.jsx
+import { Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import ProductPage from './pages/Products';
 
 function App() {
   return (
     <>
-      <nav style={{ padding: "10px" }}>
-        <Link to="/">Home</Link> | <Link to="/products">🏍️ Products</Link>
+      <nav style={{ padding: '10px', backgroundColor: '#f5f5f5' }}>
+        <Link to="/" style={{ marginRight: '10px' }}>🏠 Home</Link>
       </nav>
 
       <Routes>
-        <Route path="/" element={<h2>Welcome to Review Analyzer</h2>} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/product/:productId" element={<ProductReviewList />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/products/:productId" element={<ProductPage />} />
       </Routes>
     </>
   );
