@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { analyzeSingleReview } from '../service/api';
-import { appendNewReview } from '../features/review/productReviewSlice';
+import { appendNewReview, fetchProductReviews } from '../features/review/productReviewSlice';
 
 const ProductReviewForm = () => {
   const [review, setReview] = useState('');
@@ -20,6 +20,9 @@ const ProductReviewForm = () => {
       const result = await analyzeSingleReview({ review, product_id: productId });
       dispatch(appendNewReview(result));
       setReview('');
+      setTimeout(() => {
+        dispatch(fetchProductReviews(productId));
+      }, 3000);
     } catch (err) {
       console.error('❌ Review submission failed', err);
     } finally {

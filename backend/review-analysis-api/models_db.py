@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Float, DateTime, Text, ForeignKey
+from sqlalchemy import create_engine, Column, String, Float, DateTime, Text, ForeignKey, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timezone
@@ -18,7 +18,7 @@ class ReviewLog(Base):
     __tablename__ = 'review_logs'
     review = Column(Text, primary_key=True)
     hash = Column(String, unique=True)
-    product_id = Column(String, ForeignKey('products.id'), nullable=False)
+    product_id = Column(String, ForeignKey('products.id', ondelete="CASCADE"), nullable=False)
     sentiment = Column(String)
     sentiment_score = Column(Float)
     emotion = Column(String)
@@ -37,5 +37,12 @@ class ReviewLog(Base):
 
 # DB Setup
 engine = create_engine("sqlite:///review_logs.db")
+
+@event.listens_for(engine, "connect")
+def enable_sqlite_fk_constraints(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)
